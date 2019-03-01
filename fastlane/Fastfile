@@ -3,26 +3,26 @@ before_all do
 end
 
 lane :test do
-    # upload to Firebase Test Lab
-    firebase_test_lab_android(
-      project_id: "cats-firebase",
-      gcloud_service_key_file: "fastlane/client-secret.json",
-      type: "robo",
-      devices: [
-        {
-          model: "hammerhead",
-          version: "21",
-          locale: "ja_JP",
-          orientation: "portrait"
-        },
-        {
-          model: "Pixel2",
-          version: "28"
-        }
-      ],
-      app_apk: "test.apk",
-      console_log_file_name: "fastlane/console_output.log",
-      timeout: "1m",
-      notify_to_slack: true
-    )
+  # upload to Firebase Test Lab
+  firebase_test_lab_android(
+    project_id: "winticket-firebase",
+    gcloud_service_key_file: "fastlane/client-secret.json",
+    type: "robo",
+    devices: [
+      {
+        model: "hammerhead",
+        version: "21",
+        locale: "ja_JP",
+        orientation: "portrait"
+      },
+      {
+        model: "Pixel2",
+        version: "28"
+      }
+    ],
+    app_apk: "test.apk",
+    console_log_file_name: "fastlane/console_output.log",
+    timeout: "1m",
+    notify_to_slack: true
+  )
 end
