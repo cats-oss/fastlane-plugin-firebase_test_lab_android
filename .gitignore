@@ -4,6 +4,8 @@
 # Gem
 *.gem
 Gemfile.lock
+vendor/bundle
+.bundle/config
 
 ## Documentation cache and generated files:
 /.yardoc/
