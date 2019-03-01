@@ -1,0 +1,27 @@
+before_all do
+  ENV["SLACK_URL"] = "https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
+end
+
+lane :test do
+    # upload to Firebase Test Lab
+    firebase_test_lab_android(
+      project_id: "cats-firebase",
+      gcloud_service_key_file: "fastlane/client-secret.json",
+      devices: [
+        {
+          model: "hammerhead",
+          version: "21",
+          locale: "ja_JP",
+          orientation: "portrait"
+        },
+        {
+          model: "Pixel2",
+          version: "28"
+        }
+      ],
+      app_apk: "test.apk",
+      console_log_file_name: "fastlane/console_output.log",
+      timeout: "1m",
+      notify_to_slack: true
+    )
+end
