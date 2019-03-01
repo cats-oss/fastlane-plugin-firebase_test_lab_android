@@ -171,7 +171,7 @@ module Fastlane
 
       def self.example_code
         ['firebase_test_lab_android(
-              project_id: "winticket-firebase",
+              project_id: "cats-firebase",
               gcloud_service_key_file: "fastlane/client-secret.json",
               type: "robo",
               devices: [

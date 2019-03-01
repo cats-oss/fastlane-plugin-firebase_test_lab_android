@@ -61,33 +61,36 @@ Test your app with Firebase Test Lab with ease using fastlane.
 Check out the [example `Fastfile`](fastlane/Fastfile) to see how to use this plugin.
 
 ```ruby
-before_all do
-  # If you use `notify_to_slack` option
-  ENV["SLACK_URL"] = "https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
+lane :test do
+  # upload to Firebase Test Lab
+  firebase_test_lab_android(
+    project_id: "cats-firebase",
+    gcloud_service_key_file: "fastlane/client-secret.json",
+    type: "robo", # or instrumentation
+    devices: [
+      {
+        model: "hammerhead",
+        version: "21",
+        locale: "ja_JP",
+        orientation: "portrait"
+      },
+      {
+        model: "Pixel2",
+        version: "28"
+      }
+    ],
+    app_apk: "test.apk",
+    # app_test_apk: "test.apk" if you wanna do instrumentation
+    console_log_file_name: "fastlane/console_output.log",
+    timeout: "3m",
+    notify_to_slack: true # or false
+  )
 end
 
-firebase_test_lab_android(
-  project_id: "cats-firebase",
-  gcloud_service_key_file: "fastlane/client-secret.json",
-  type: "robo", # or instrumentation
-  devices: [
-    {
-      model: "hammerhead",
-      version: "21",
-      locale: "ja_JP",
-      orientation: "portrait"
-    },
-    {
-      model: "Pixel2",
-      version: "28"
-    }
-  ],
-  app_apk: "test.apk",
-  # app_test_apk: "test.apk" if you wanna do instrumentation
-  console_log_file_name: "fastlane/console_output.log",
-  timeout: "3m",
-  notify_to_slack: true # or false
-)
+before_all do
+# If you use `notify_to_slack` option
+  ENV["SLACK_URL"] = "https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
+end
 ```
 
 ## Issues and Feedback
