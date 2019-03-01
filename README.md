@@ -9,10 +9,13 @@ Inspired by [Firebase test lab plugin for ios](https://github.com/fastlane/fastl
 
 ## Getting Started
 
+[![License](https://img.shields.io/github/license/cats-oss/fastlane-plugin-firebase_test_lab_android.svg)](https://github.com/cats-oss/fastlane-plugin-firebase_test_lab_android/blob/master/LICENSE)
+[![Gem](https://img.shields.io/gem/v/fastlane-plugin-firebase_test_lab_android.svg?style=flat)](https://rubygems.org/gems/fastlane-plugin-firebase_test_lab_android)
+[![fastlane Plugin Badge](https://rawcdn.githack.com/fastlane/fastlane/master/fastlane/assets/plugin-badge.svg)](https://rubygems.org/gems/fastlane-plugin-firebase_test_lab_android)
+
 This project is a [_fastlane_](https://github.com/fastlane/fastlane) plugin. To get started with `fastlane-plugin-firebase_test_lab_android`, add it to your project by running:
 
 ```bash
-(not yet)
 fastlane add_plugin firebase_test_lab_android 
 ```
 
