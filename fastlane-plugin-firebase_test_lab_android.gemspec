@@ -11,17 +11,12 @@ Gem::Specification.new do |spec|
   spec.email         = 'dadadada.chop@gmail.com'
 
   spec.summary       = 'Test your app with Firebase Test Lab with ease using fastlane'
-  # spec.homepage      = "https://github.com/<GITHUB_USERNAME>/fastlane-plugin-firebase_test_lab_android"
+  spec.homepage      = "https://github.com/cats-oss/fastlane-plugin-firebase_test_lab_android"
   spec.license       = "MIT"
 
   spec.files         = Dir["lib/**/*"] + %w(README.md LICENSE)
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
-
-  # Don't add a dependency to fastlane or fastlane_re
-  # since this would cause a circular dependency
-
-  # spec.add_dependency 'your-dependency', '~> 1.0.0'
 
   spec.add_development_dependency('pry')
   spec.add_development_dependency('bundler')
