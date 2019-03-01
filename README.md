@@ -62,13 +62,14 @@ Check out the [example `Fastfile`](fastlane/Fastfile) to see how to use this plu
 
 ```ruby
 before_all do
+  # If you use `notify_to_slack` option
   ENV["SLACK_URL"] = "https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
 end
 
 firebase_test_lab_android(
   project_id: "cats-firebase",
   gcloud_service_key_file: "fastlane/client-secret.json",
-  type: "robo",
+  type: "robo", # or instrumentation
   devices: [
     {
       model: "hammerhead",
@@ -82,9 +83,10 @@ firebase_test_lab_android(
     }
   ],
   app_apk: "test.apk",
+  # app_test_apk: "test.apk" if you wanna do instrumentation
   console_log_file_name: "fastlane/console_output.log",
-  timeout: "1m",
-  notify_to_slack: true
+  timeout: "3m",
+  notify_to_slack: true # or false
 )
 ```
 
