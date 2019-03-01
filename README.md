@@ -7,8 +7,6 @@
 Inspired by [Firebase test lab plugin for ios](https://github.com/fastlane/fastlane-plugin-firebase_test_lab)
 
 
-[![fastlane Plugin Badge](https://rawcdn.githack.com/fastlane/fastlane/master/fastlane/assets/plugin-badge.svg)](https://rubygems.org/gems/fastlane-plugin-firebase_test_lab_android)
-
 ## Getting Started
 
 This project is a [_fastlane_](https://github.com/fastlane/fastlane) plugin. To get started with `fastlane-plugin-firebase_test_lab_android`, add it to your project by running:
