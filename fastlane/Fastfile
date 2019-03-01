@@ -7,6 +7,7 @@ lane :test do
     firebase_test_lab_android(
       project_id: "cats-firebase",
       gcloud_service_key_file: "fastlane/client-secret.json",
+      type: "robo",
       devices: [
         {
           model: "hammerhead",
