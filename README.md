@@ -60,6 +60,10 @@ Test your app with Firebase Test Lab with ease using fastlane.
 Check out the [example `Fastfile`](fastlane/Fastfile) to see how to use this plugin.
 
 ```ruby
+before_all do
+  ENV["SLACK_URL"] = "https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
+end
+
 firebase_test_lab_android(
   project_id: "cats-firebase",
   gcloud_service_key_file: "fastlane/client-secret.json",
