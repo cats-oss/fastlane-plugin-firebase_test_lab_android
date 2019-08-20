@@ -80,6 +80,8 @@ lane :test do
       }
     ],
     app_apk: "test.apk",
+    # Extra options that if you need to pass to the gcloud cli
+    extra_options: "--robo-directives ignore:image_button_sign_in_twitter=,ignore:text_sign_in_terms_of_service=",
     # app_test_apk: "test.apk" if you wanna do instrumentation
     console_log_file_name: "fastlane/console_output.log",
     timeout: "3m",
