@@ -187,6 +187,7 @@ module Fastlane
                 }
               ],
               app_apk: "test.apk",
+              extra_options: "--robo-directives ignore:image_button_sign_in_twitter=,ignore:text_sign_in_terms_of_service="
               console_log_file_name: "fastlane/console_output.log",
               timeout: "3m",
               notify_to_slack: true
