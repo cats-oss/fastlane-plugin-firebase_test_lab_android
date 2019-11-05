@@ -1,7 +1,7 @@
 # Firebase Test Lab plugin for fastlane
 
 <p align="center">
-  <img src="./art/firebase-test-lab.jpg" width="600" />
+  <img src="art/firebase-test-lab_cover.jpg" width="600" />
 </p>
 
 Inspired by [Firebase test lab plugin for ios](https://github.com/fastlane/fastlane-plugin-firebase_test_lab)
