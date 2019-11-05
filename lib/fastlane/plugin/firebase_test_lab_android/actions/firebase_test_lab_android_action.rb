@@ -210,28 +210,43 @@ module Fastlane
       end
 
       def self.example_code
-        ['firebase_test_lab_android(
+        ['before_all do
+            ENV["SLACK_URL"] = "https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
+          end
+
+          lane :test do
+
+            # Get Pull request number
+            pr_number = ENV["CI_PULL_REQUEST"] != nil ? ENV["CI_PULL_REQUEST"][/(?<=https:\/\/github.com\/cats-oss\/android\/pull\/)(.*)/] : nil
+
+            # Upload to Firebase Test Lab
+            firebase_test_lab_android(
               project_id: "cats-firebase",
               gcloud_service_key_file: "fastlane/client-secret.json",
               type: "robo",
               devices: [
                 {
-                    model: "hammerhead",
-                    version: "21",
-                    locale: "ja_JP",
-                    orientation: "portrait"
+                  model: "Nexus6P",
+                  version: "23",
+                  locale: "ja_JP",
+                  orientation: "portrait"
                 },
                 {
-                    model: "Pixel2",
-                    version: "28"
+                  model: "Pixel2",
+                  version: "28"
                 }
               ],
               app_apk: "test.apk",
-              extra_options: "--robo-directives ignore:image_button_sign_in_twitter=,ignore:text_sign_in_terms_of_service=",
               console_log_file_name: "fastlane/console_output.log",
-              timeout: "3m",
-              notify_to_slack: true
-          )']
+              timeout: "60s",
+              firebase_test_lab_results_bucket: "firebase-test-lab-result-bucket",
+              slack_url: ENV["SLACK_URL"],
+              github_owner: "cats-oss",
+              github_repository: "fastlane-plugin-firebase_test_lab_android",
+              github_pr_number: pr_number,
+              github_api_token: ENV["DANGER_GITHUB_API_TOKEN"]
+            )
+          end']
       end
     end
   end

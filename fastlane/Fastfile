@@ -2,9 +2,12 @@ before_all do
   ENV["SLACK_URL"] = "https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
 end
 
-pr_number = ENV["CI_PULL_REQUEST"] != nil ? ENV["CI_PULL_REQUEST"][/(?<=https:\/\/github.com\/cats-oss\/android\/pull\/)(.*)/] : nil
 lane :test do
-  # upload to Firebase Test Lab
+
+  # Get Pull Request number
+  pr_number = ENV["CI_PULL_REQUEST"] != nil ? ENV["CI_PULL_REQUEST"][/(?<=https:\/\/github.com\/cats-oss\/android\/pull\/)(.*)/] : nil
+
+  # Upload to Firebase Test Lab
   firebase_test_lab_android(
     project_id: "cats-firebase",
     gcloud_service_key_file: "fastlane/client-secret.json",
