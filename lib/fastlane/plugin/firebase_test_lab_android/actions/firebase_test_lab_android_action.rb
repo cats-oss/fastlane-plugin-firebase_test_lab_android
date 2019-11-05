@@ -1,20 +1,6 @@
 require 'fastlane/action'
 
 module Fastlane
-  module Commands
-    def self.config
-      "gcloud config set project"
-    end
-
-    def self.auth
-      "gcloud auth activate-service-account"
-    end
-
-    def self.run_tests
-      "gcloud firebase test android run"
-    end
-  end
-
   module Actions
     class FirebaseTestLabAndroidAction < Action
       PIPE = "testlab-pipe"
