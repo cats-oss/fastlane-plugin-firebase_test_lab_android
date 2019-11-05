@@ -95,8 +95,8 @@ module Fastlane
         Firebase console: [#{project_id}](#{Helper.firebase_test_lab_histories_url(project_id)}) 
         Test results: [#{path}](#{Helper.gcs_result_bucket_url(bucket, path)})
 
-        | Device | Status | Details |
-        | --- | --- | --- |
+        | :iphone: Device | :thermometer: Status | :memo: Message |
+        | --- | :---: | --- |
         #{cells}
       EOS
       return prefix, comment
