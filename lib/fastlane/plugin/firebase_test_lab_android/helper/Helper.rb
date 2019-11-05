@@ -67,32 +67,32 @@ module Fastlane
     def self.make_slack_text(json)
       success = true
       json.each do |status|
-        success = !Helper.is_failure(status["outcome"])
+        success = !is_failure(status["outcome"])
         break unless success
       end
 
       body = json.map { |status|
         outcome = status["outcome"]
-        emoji = Helper.emoji_status(outcome)
-        device = Helper.format_device_name(status["axis_value"])
+        emoji = emoji_status(outcome)
+        device = format_device_name(status["axis_value"])
         "#{device}: #{emoji} #{outcome}\n"
       }.inject(&:+)
       return success, body
     end
 
     def self.make_github_text(json, project_id, bucket, path)
-      prefix = "<p align=\"center\"><img src=https://github.com/cats-oss/fastlane-plugin-firebase_test_lab_android/blob/master/art/firebase_test_lab_logo.png?raw=true width=75%/></p>"
+      prefix = "<p align=\"left\"><img src=https://github.com/cats-oss/fastlane-plugin-firebase_test_lab_android/blob/master/art/firebase_test_lab_logo.png?raw=true width=65%/></p>"
       cells = json.map { |status|
         outcome = status["outcome"]
-        emoji = Helper.emoji_status(outcome)
-        device = Helper.format_device_name(status["axis_value"])
-        "| #{device} | #{emoji} #{outcome} | #{status["test_details"]} |\n"
+        emoji = emoji_status(outcome)
+        axis = status["axis_value"]
+        "| **#{format_device_name(axis)}** | #{emoji} #{outcome} | #{status["test_details"]} |\n"
       }.inject(&:+)
       comment = <<~EOS
         #{prefix}
 
         ### Results
-        Firebase Console: [#{project_id}](#{Helper.firebase_test_lab_histories_url(project_id)}) 
+        Firebase console: [#{project_id}](#{Helper.firebase_test_lab_histories_url(project_id)}) 
         Test results: [#{path}](#{Helper.gcs_result_bucket_url(bucket, path)})
 
         | Device | Status | Details |
