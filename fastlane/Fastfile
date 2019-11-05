@@ -10,8 +10,8 @@ lane :test do
     type: "robo",
     devices: [
       {
-        model: "hammerhead",
-        version: "21",
+        model: "Nexus6P",
+        version: "23",
         locale: "ja_JP",
         orientation: "portrait"
       },
