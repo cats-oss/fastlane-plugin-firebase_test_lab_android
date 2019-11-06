@@ -14,8 +14,8 @@ module Fastlane
       "https://console.developers.google.com/storage/browser/#{bucket}/#{CGI.escape(dir)}"
     end
 
-    def self.gcs_artifact_url(bucket, path)
-      "https://storage.cloud.google.com/#{bucket}/#{CGI.escape(path)}"
+    def self.firebase_object_url(bucket, path)
+      "https://firebasestorage.googleapis.com/v0/b/#{bucket}/o/#{CGI.escape(path)}?alt=media"
     end
 
     def self.firebase_test_lab_histories_url(project_id)
