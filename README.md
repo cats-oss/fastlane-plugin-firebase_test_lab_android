@@ -159,9 +159,11 @@ end
 ### Finish. Check your slack or Github PR
 
 **If you set `slack_url: ENV["SLACK_URL"]` to Fastfile.**
+
 <img src="art/screenshot_slack.png" width="75%" />
 
 **If you set `github_owner, github_repository, github_pr_number, github_api_token` to Fastfile.**
+
 <img src="art/screenshot_github.png" width="75%" />
 
 
