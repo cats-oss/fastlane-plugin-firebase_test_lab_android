@@ -10,16 +10,16 @@ module Fastlane
 
   module Helper
 
-    def self.gcs_result_bucket_url(bucket, path)
-      "https://console.developers.google.com/storage/browser/#{bucket}/#{CGI.escape(path)}"
+    def self.gcs_result_bucket_url(bucket, dir)
+      "https://console.developers.google.com/storage/browser/#{bucket}/#{CGI.escape(dir)}"
+    end
+
+    def self.gcs_artifact_url(bucket, path)
+      "https://storage.cloud.google.com/#{bucket}/#{CGI.escape(path)}"
     end
 
     def self.firebase_test_lab_histories_url(project_id)
       "https://console.firebase.google.com/u/0/project/#{project_id}/testlab/histories/"
-    end
-
-    def self.firebase_object_url(bucket, path)
-      "https://firebasestorage.googleapis.com/v0/b/#{bucket}/o/#{CGI.escape(path)}?alt=media"
     end
 
     def self.config(project_id)
