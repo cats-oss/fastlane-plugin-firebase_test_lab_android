@@ -1,7 +1,7 @@
 # Firebase Test Lab plugin for fastlane
 
 <p align="center">
-  <img src="art/firebase-test-lab_cover.jpg" width="600" />
+  <img src="art/screenshot_github.png" width="75%" />
 </p>
 
 Inspired by [Firebase test lab plugin for ios](https://github.com/fastlane/fastlane-plugin-firebase_test_lab)
@@ -13,38 +13,91 @@ Inspired by [Firebase test lab plugin for ios](https://github.com/fastlane/fastl
 [![Gem](https://img.shields.io/gem/v/fastlane-plugin-firebase_test_lab_android.svg?style=flat)](https://rubygems.org/gems/fastlane-plugin-firebase_test_lab_android)
 [![fastlane Plugin Badge](https://rawcdn.githack.com/fastlane/fastlane/master/fastlane/assets/plugin-badge.svg)](https://rubygems.org/gems/fastlane-plugin-firebase_test_lab_android)
 
+### Step 1. First of all, get started with Firebase Test Lab from the gcloud Command Line
+
+Please check [Firebase documents](https://firebase.google.com/docs/test-lab/android/command-line)
+
+Using Google Cloud SDK
+```
+# gcloud firebase test android run \
+  --type robo \
+  --app app-debug-unaligned.apk \
+  --device model=Nexus6,version=24,locale=en,orientation=portrait  \
+  --timeout 90s
+  
+  ...
+  ...
+  ...
+
+Robo testing complete.
+
+More details are available at [https://console.firebase.google.com/project/*******/testlab/histories/**********/matrices/********].
+┌─────────┬───────────────────────┬──────────────┐
+│ OUTCOME │    TEST_AXIS_VALUE    │ TEST_DETAILS │
+├─────────┼───────────────────────┼──────────────┤
+│ Passed  │ Nexus6-24-en-portrait │ --           │
+└─────────┴───────────────────────┴──────────────┘
+```
+
+### Step 2. Add to your project
 This project is a [_fastlane_](https://github.com/fastlane/fastlane) plugin. To get started with `fastlane-plugin-firebase_test_lab_android`, add it to your project by running:
 
-```bash
+```
 fastlane add_plugin firebase_test_lab_android 
 ```
 
-### If you are not current user of Firebase
+### Step 3. Create a GCS bucket
 
-You need to set up Firebase first. These only needs to be done once for an organization.
+[Creating storage buckets](https://cloud.google.com/storage/docs/creating-buckets)
 
-- If you have not used Google Cloud before, you need to [create a new Google Cloud project](https://cloud.google.com/resource-manager/docs/creating-managing-projects#Creating%20a%20Project) first.
-- Go to the [Firebase Console](https://console.firebase.google.com/). Add Firebase into your Google Cloud project by clicking on "Add project" and then choose your just-created project.
+You will need the bucket name later in the Fastfile.
 
-### Configure Google credentials through service accounts
+If you using the `gsutil`.
+```s
+gsutil mb gs://[BUCKET_NAME]/
+```
+```
+# gsutil mb gs://firebase_cats_test_bucket                    
+Creating gs://firebase_cats_test_bucket/...
+```
 
-To authenticate, Google Cloud credentials will need to be set for any machine where _fastlane_ and this plugin runs on.
 
-If you are running this plugin on Google Cloud [Compute Engine](https://cloud.google.com/compute), [Kubernetes Engine](https://cloud.google.com/kubernetes-engine) or [App Engine flexible environment](https://cloud.google.com/appengine/docs/flexible/), a default service account is automatically provisioned. You will not need to create a service account. See [this](https://cloud.google.com/compute/docs/access/service-accounts#compute_engine_default_service_account) for more details.
+### Step 4. Import existing Google Cloud Storage buckets to Firebase Storage
 
-In all other cases, you need to configure the service account manually. You can follow [this guide](https://cloud.google.com/docs/authentication/getting-started) on how to create a new service account and create a key for it. You will need to set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable pointing to the service account key file according to the document.
+https://firebase.google.com/docs/storage
 
-No matter if you are a using an automatically provisioned service account or a manually created one, the service account must be configured to have the project editor role.
+Import GCS bucket on Firebase console at Storage.
 
-### Enable relevant Google APIs
+<img src="art/screenshot_firebase_storage_setup_bucket.png" width="75%" />
 
-- You need to enable the following APIs on your [Google Cloud API library](https://console.cloud.google.com/apis/library) (see [this](https://support.google.com/cloud/answer/6158841) for instructions how):
-  1. Cloud Testing API
-  2. Cloud Tool Results API
 
-### Find the devices you want to test on
+#### Step 4-2. 
 
-If you have [gcloud tool](https://cloud.google.com/sdk/gcloud/), you can run
+Edit the Firebase Security Rules on Firebase console.
+
+<img src="art/screenshot_firebase_storage_rules.png" width="75%" />
+
+This plugin need some match rules it `images` and `logcat` file for hyperlinks.
+```
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{result_dir}/{device}/artifacts/{image} {
+    	allow read: if image.matches(".*(jpeg|jpg|png)$")
+  	}
+    match /{result_dir}/{device}/{file} {
+    	allow read: if file.matches("logcat")
+  	}
+    match /{allPaths=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
+```
+
+### Step 5. Find the devices you want to test on
+
+Using [gcloud tool](https://cloud.google.com/sdk/gcloud/), you can run.
 
 ```no-highlight
 gcloud beta firebase test android models list
@@ -55,22 +108,30 @@ to get a list of supported devices and their identifiers.
 Alternatively all available devices can also be seen [here](https://firebase.google.com/docs/test-lab/ios/available-testing-devices). 
 
 
-## Actions
+### Step 6. Add settings to your Fastfile
 
 Test your app with Firebase Test Lab with ease using fastlane.  
 Check out the [example `Fastfile`](fastlane/Fastfile) to see how to use this plugin.
 
 ```ruby
+before_all do
+    ENV["SLACK_URL"] = "https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
+  end
+
 lane :test do
-  # upload to Firebase Test Lab
+
+  # Get Pull request number from CI
+  pr_number = ENV["CI_PULL_REQUEST"] != nil ? ENV["CI_PULL_REQUEST"][/(?<=https:\/\/github.com\/cats-oss\/android\/pull\/)(.*)/] : nil
+
+  # Upload to Firebase Test Lab
   firebase_test_lab_android(
-    project_id: "cats-firebase",
-    gcloud_service_key_file: "fastlane/client-secret.json",
-    type: "robo", # or instrumentation
-    devices: [
+    project_id: "cats-firebase",                                    # Your Firebase project name.
+    gcloud_service_key_file: "fastlane/client-secret.json",         # File path containing the gcloud auth key.
+    type: "robo",                                                   # Optional: Test type (robo/instrumentation).
+    devices: [                                                      # Devices
       {
-        model: "hammerhead",
-        version: "21",
+        model: "Nexus6P",
+        version: "23",
         locale: "ja_JP",
         orientation: "portrait"
       },
@@ -79,21 +140,30 @@ lane :test do
         version: "28"
       }
     ],
-    app_apk: "test.apk",
-    # Extra options that if you need to pass to the gcloud cli
-    extra_options: "--robo-directives ignore:image_button_sign_in_twitter=,ignore:text_sign_in_terms_of_service=",
-    # app_test_apk: "test.apk" if you wanna do instrumentation
-    console_log_file_name: "fastlane/console_output.log",
-    timeout: "3m",
-    notify_to_slack: true # or false
+    app_apk: "app-debug.apk",                                       # The path for your android app apk.
+    # app_test_apk: "app-test.apk",                                 # The path for your android test apk.
+    console_log_file_name: "fastlane/console_output.log",           
+    timeout: "3m",                                                  
+    firebase_test_lab_results_bucket: "firebase_cats_test_bucket",  # 
+    slack_url: ENV["SLACK_URL"],                                    # IF you want notify to Slack.
+
+    # If you want notify to Github pull requests.
+    github_owner: "******",                                         # Owner name. 
+    github_repository: "************",                              # Repository name.
+    github_pr_number: pr_number,                                    # If you using run on CI that need pull request number for auto comment.
+    github_api_token: ENV["GITHUB_API_TOKEN"]                       # https://github.com/settings/tokens
   )
 end
-
-before_all do
-# If you use `notify_to_slack` option
-  ENV["SLACK_URL"] = "https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
-end
 ```
+
+### Finish. Check your slack or Github PR
+
+**If you set `slack_url: ENV["SLACK_URL"]` to Fastfile.**
+<img src="art/screenshot_slack.png" width="75%" />
+
+**If you set `github_owner, github_repository, github_pr_number, github_api_token` to Fastfile.**
+<img src="art/screenshot_github.png" width="75%" />
+
 
 ## Issues and Feedback
 
