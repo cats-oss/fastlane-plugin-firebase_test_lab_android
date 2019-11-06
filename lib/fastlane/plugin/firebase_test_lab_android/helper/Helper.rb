@@ -41,6 +41,12 @@ module Fastlane
       outcome == FAILED || outcome == INCONCLUSIVE
     end
 
+    def self.format_device_name(axis_value)
+      # Sample Nexus6P-23-ja_JP-portrait
+      array = axis_value.split("-")
+      "#{array[0]} (API #{array[1]})"
+    end
+
     def self.emoji_status(outcome)
       # Github emoji list
       # https://gist.github.com/rxaviers/7360908
@@ -58,10 +64,8 @@ module Fastlane
              end
     end
 
-    def self.format_device_name(axis_value)
-      # Sample Nexus6P-23-ja_JP-portrait
-      array = axis_value.split("-")
-      "#{array[0]} (API #{array[1]})"
+    def self.random_emoji_cat
+      %w(:smiley_cat: :smile_cat: :joy_cat: :heart_eyes_cat: :smirk_cat: :kissing_cat:).sample
     end
 
     def self.make_slack_text(json)
@@ -80,23 +84,27 @@ module Fastlane
       return success, body
     end
 
-    def self.make_github_text(json, project_id, bucket, path)
-      prefix = "<p align=\"left\"><img src=https://github.com/cats-oss/fastlane-plugin-firebase_test_lab_android/blob/master/art/firebase_test_lab_logo.png?raw=true width=65%/></p>"
-      cells = json.map { |status|
-        outcome = status["outcome"]
-        emoji = emoji_status(outcome)
-        axis = status["axis_value"]
-        "| **#{format_device_name(axis)}** | #{emoji} #{outcome} | #{status["test_details"]} |\n"
+    def self.make_github_text(json, project_id, bucket, dir)
+      prefix = "<img src=\"https://github.com/cats-oss/fastlane-plugin-firebase_test_lab_android/blob/master/art/firebase_test_lab_logo.png?raw=true\" width=\"65%\" />"
+      cells = json.map { |data|
+        axis = data["axis_value"]
+        device = format_device_name(axis)
+        outcome = data["outcome"]
+        status = "#{emoji_status(outcome)} #{outcome}"
+        message = data["test_details"]
+        logcat = "[#{random_emoji_cat}](#{gcs_artifact_url(bucket, "#{dir}/#{axis}/logcat")})"
+        sitemp  = "<img src=\"#{gcs_artifact_url(bucket, "#{dir}/#{axis}/artifacts/sitemap.png")}\" heigth=\"64px\" />"
+        "| **#{device}** | #{status} | #{message} | #{logcat} | #{sitemp} |\n"
       }.inject(&:+)
       comment = <<~EOS
         #{prefix}
 
         ### Results
         Firebase console: [#{project_id}](#{Helper.firebase_test_lab_histories_url(project_id)}) 
-        Test results: [#{path}](#{Helper.gcs_result_bucket_url(bucket, path)})
+        Test results: [#{dir}](#{Helper.gcs_result_bucket_url(bucket, dir)})
 
-        | :iphone: Device | :thermometer: Status | :memo: Message |
-        | --- | :---: | --- |
+        | :iphone: Device | :thermometer: Status | :memo: Message | :eyes: Logcat | :japan: Sitemap | 
+        | --- | :---: | --- | :---: | :---: |
         #{cells}
       EOS
       return prefix, comment
