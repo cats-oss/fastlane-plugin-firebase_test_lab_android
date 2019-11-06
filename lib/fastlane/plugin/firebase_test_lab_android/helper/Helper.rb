@@ -85,15 +85,15 @@ module Fastlane
     end
 
     def self.make_github_text(json, project_id, bucket, dir)
-      prefix = "<img src=\"https://github.com/cats-oss/fastlane-plugin-firebase_test_lab_android/blob/master/art/firebase_test_lab_logo.png?raw=true\" width=\"65%\" />"
+      prefix = "<img src=\"https://github.com/cats-oss/fastlane-plugin-firebase_test_lab_android/blob/master/art/firebase_test_lab_logo.png?raw=true\" width=\"65%\" loading=\"lazy\" />"
       cells = json.map { |data|
         axis = data["axis_value"]
         device = format_device_name(axis)
         outcome = data["outcome"]
         status = "#{emoji_status(outcome)} #{outcome}"
         message = data["test_details"]
-        logcat = "[#{random_emoji_cat}](#{gcs_artifact_url(bucket, "#{dir}/#{axis}/logcat")})"
-        sitemp  = "<img src=\"#{gcs_artifact_url(bucket, "#{dir}/#{axis}/artifacts/sitemap.png")}\" heigth=\"64px\" />"
+        logcat = "<a href=\"#{firebase_object_url(bucket, "#{dir}/#{axis}/logcat")}\" target=\"_blank\" >#{random_emoji_cat}</a>"
+        sitemp = "<img src=\"#{firebase_object_url(bucket, "#{dir}/#{axis}/artifacts/sitemap.png")}\" height=\"64px\" loading=\"lazy\" target=\"_blank\" />"
         "| **#{device}** | #{status} | #{message} | #{logcat} | #{sitemp} |\n"
       }.inject(&:+)
       comment = <<~EOS
