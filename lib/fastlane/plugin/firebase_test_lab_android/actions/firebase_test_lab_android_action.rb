@@ -1,57 +1,67 @@
 require 'fastlane/action'
+require 'json'
 
 module Fastlane
-  module Commands
-    def self.config
-      "gcloud config set project"
-    end
-
-    def self.auth
-      "gcloud auth activate-service-account"
-    end
-
-    def self.run_tests
-      "gcloud firebase test android run"
-    end
-  end
-
   module Actions
     class FirebaseTestLabAndroidAction < Action
-      PIPE = "testlab-pipe"
 
       def self.run(params)
         UI.message("Starting...")
 
-        UI.message("Set Google Cloud target project.")
-        Action.sh("#{Commands.config} #{params[:project_id]}")
+        results_bucket = params[:firebase_test_lab_results_bucket] == nil ? "#{params[:project_id]}_test_results" : params[:firebase_test_lab_results_bucket]
+        results_dir = "firebase_test_result_#{DateTime.now.strftime('%Y-%m-%d-%H:%M:%S')}"
 
-        UI.message("Authenticate with Google Cloud.")
-        Action.sh("#{Commands.auth} --key-file #{params[:gcloud_service_key_file]}")
-
-        UI.message("Running...")
-        Action.sh("rm #{PIPE}") if File.exist?(PIPE)
-        Action.sh("mkfifo #{PIPE}")
-        Action.sh("set +e;"\
-                  "tee #{params[:console_log_file_name]} < #{PIPE} & "\
-                  "#{Commands.run_tests} "\
-                  "--type #{params[:type]} "\
+        # Set target project
+        Helper.config(params[:project_id])
+        # Activate service account
+        Helper.authenticate(params[:gcloud_service_key_file])
+        # Run Firebase Test Lab
+        Helper.run_tests("--type #{params[:type]} "\
+                  "#{"--use-orchestrator " if params[:type] == "instrumentation"}"\
                   "--app #{params[:app_apk]} "\
                   "#{"--test #{params[:app_test_apk]} " unless params[:app_test_apk].nil?}"\
                   "#{params[:devices].map { |d| "--device model=#{d[:model]},version=#{d[:version]},locale=#{d[:locale]},orientation=#{d[:orientation]} " }.join}"\
                   "--timeout #{params[:timeout]} "\
+                  "--results-bucket #{results_bucket} "\
+                  "--results-dir #{results_dir} "\
                   "#{params[:extra_options]} "\
-                  "> #{PIPE} 2>&1;"\
-                  "set -e")
-        Action.sh("rm #{PIPE}") if File.exist?(PIPE)
+                  "--format=json 1>#{params[:console_log_file_name]}"
+        )
 
-        if params[:notify_to_slack]
-          output = File.read(params[:console_log_file_name])
-          failed = output.include?("Failed") || output.include?("Inconclusive")
-          other_action.slack(message: output,
-                             success: !failed,
-                             use_webhook_configured_username_and_icon: true,
-                             default_payloads: [:git_branch, :git_author, :last_git_commit])
+        # Sample data
+        # [
+        #   {
+        #     "axis_value": "Nexus6P-23-ja_JP-portrait",
+        #     "outcome": "Passed",
+        #     "test_details": "--"
+        #   },
+        #   {
+        #     "axis_value": "Pixel2-28-en_US-portrait",
+        #     "outcome": "Passed",
+        #     "test_details": "--"
+        #   }
+        # ]
+        json = JSON.parse(File.read(params[:console_log_file_name]))
+
+        # Notify to Slack
+        if params[:slack_url] != nil
+          success, body = Helper.make_slack_text(json)
+          SlackNotifier.notify(params[:slack_url], body, success)
         end
+
+        # Notify to Github
+        owner = params[:github_owner]
+        repository = params[:github_repository]
+        pr_number = params[:github_pr_number]
+        api_token = params[:github_api_token]
+        unless owner.nil? || repository.nil? || pr_number.nil? || api_token.nil?
+          prefix, comment = Helper.make_github_text(json, params[:project_id], results_bucket, results_dir)
+          # Delete past comments
+          GitHubNotifier.delete_comments(owner, repository, pr_number, prefix, api_token)
+          GitHubNotifier.put_comment(owner, repository, pr_number, comment, api_token)
+        end
+
+        UI.message("Finishing...")
       end
 
       def self.description
@@ -119,7 +129,7 @@ module Fastlane
                                       description: "The max time this test execution can run before it is cancelled. Default: 5m (this value must be greater than or equal to 1m)",
                                       is_string: true,
                                       optional: true,
-                                      default_value: "5m"),
+                                      default_value: "3m"),
          FastlaneCore::ConfigItem.new(key: :app_apk,
                                       env_name: "APP_APK",
                                       description: "The path for your android app apk",
@@ -143,12 +153,43 @@ module Fastlane
                                       is_string: true,
                                       optional: true,
                                       default_value: ""),
-         FastlaneCore::ConfigItem.new(key: :notify_to_slack,
-                                      env_name: "NOTIFY_TO_SLACK",
-                                      description: "Notify to Slack after finishing of the test. Default: false",
-                                      is_string: false,
+         FastlaneCore::ConfigItem.new(key: :slack_url,
+                                      env_name: "SLACK_URL",
+                                      description: "If Notify to Slack after finishing of the test. Set your slack incoming webhook url",
+                                      is_string: true,
                                       optional: true,
-                                      default_value: false)]
+                                      default_value: nil),
+         FastlaneCore::ConfigItem.new(key: :firebase_test_lab_results_bucket,
+                                      env_name: "FIREBASE_TEST_LAB_RESULTS_BUCKET",
+                                      description: "Name of Firebase Test Lab results bucket",
+                                      type: String,
+                                      optional: true,
+                                      default_value: nil),
+         FastlaneCore::ConfigItem.new(key: :github_owner,
+                                      env_name: "GITHUB_OWNER",
+                                      description: "Owner name",
+                                      type: String,
+                                      optional: true,
+                                      default_value: nil),
+         FastlaneCore::ConfigItem.new(key: :github_repository,
+                                      env_name: "GITHUB_REPOSITORY",
+                                      description: "Repository name",
+                                      type: String,
+                                      optional: true,
+                                      default_value: nil),
+         FastlaneCore::ConfigItem.new(key: :github_pr_number,
+                                      env_name: "GITHUB_PR_NUMBER",
+                                      description: "Pull request number",
+                                      type: String,
+                                      optional: true,
+                                      default_value: nil),
+         FastlaneCore::ConfigItem.new(key: :github_api_token,
+                                      env_name: "GITHUB_API_TOKEN",
+                                      description: "GitHub API Token",
+                                      type: String,
+                                      optional: true,
+                                      default_value: nil)
+        ]
       end
 
       def self.check_has_property(hash_obj, property)
@@ -170,28 +211,43 @@ module Fastlane
       end
 
       def self.example_code
-        ['firebase_test_lab_android(
+        ['before_all do
+            ENV["SLACK_URL"] = "https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
+          end
+
+          lane :test do
+
+            # Get Pull request number
+            pr_number = ENV["CI_PULL_REQUEST"] != nil ? ENV["CI_PULL_REQUEST"][/(?<=https:\/\/github.com\/cats-oss\/android\/pull\/)(.*)/] : nil
+
+            # Upload to Firebase Test Lab
+            firebase_test_lab_android(
               project_id: "cats-firebase",
               gcloud_service_key_file: "fastlane/client-secret.json",
               type: "robo",
               devices: [
                 {
-                    model: "hammerhead",
-                    version: "21",
-                    locale: "ja_JP",
-                    orientation: "portrait"
+                  model: "Nexus6P",
+                  version: "23",
+                  locale: "ja_JP",
+                  orientation: "portrait"
                 },
                 {
-                    model: "Pixel2",
-                    version: "28"
+                  model: "Pixel2",
+                  version: "28"
                 }
               ],
               app_apk: "test.apk",
-              extra_options: "--robo-directives ignore:image_button_sign_in_twitter=,ignore:text_sign_in_terms_of_service=",
               console_log_file_name: "fastlane/console_output.log",
               timeout: "3m",
-              notify_to_slack: true
-          )']
+              firebase_test_lab_results_bucket: "firebase_cats_test_bucket",
+              slack_url: ENV["SLACK_URL"],
+              github_owner: "cats-oss",
+              github_repository: "fastlane-plugin-firebase_test_lab_android",
+              github_pr_number: pr_number,
+              github_api_token: ENV["DANGER_GITHUB_API_TOKEN"]
+            )
+          end']
       end
     end
   end

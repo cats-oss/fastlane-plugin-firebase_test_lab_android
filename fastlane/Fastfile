@@ -3,15 +3,19 @@ before_all do
 end
 
 lane :test do
-  # upload to Firebase Test Lab
+
+  # Get Pull Request number
+  pr_number = ENV["CI_PULL_REQUEST"] != nil ? ENV["CI_PULL_REQUEST"][/(?<=https:\/\/github.com\/cats-oss\/android\/pull\/)(.*)/] : nil
+
+  # Upload to Firebase Test Lab
   firebase_test_lab_android(
     project_id: "cats-firebase",
     gcloud_service_key_file: "fastlane/client-secret.json",
     type: "robo",
     devices: [
       {
-        model: "hammerhead",
-        version: "21",
+        model: "Nexus6P",
+        version: "23",
         locale: "ja_JP",
         orientation: "portrait"
       },
@@ -22,7 +26,12 @@ lane :test do
     ],
     app_apk: "test.apk",
     console_log_file_name: "fastlane/console_output.log",
-    timeout: "1m",
-    notify_to_slack: true
+    timeout: "60s",
+    firebase_test_lab_results_bucket: "firebase-test-lab-result-bucket",
+    slack_url: ENV["SLACK_URL"],
+    github_owner: "cats-oss",
+    github_repository: "fastlane-plugin-firebase_test_lab_android",
+    github_pr_number: pr_number,
+    github_api_token: ENV["DANGER_GITHUB_API_TOKEN"]
   )
 end
