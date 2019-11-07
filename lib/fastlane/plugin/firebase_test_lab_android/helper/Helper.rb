@@ -49,7 +49,7 @@ module Fastlane
 
     def self.emoji_status(outcome)
       # Github emoji list
-      # https://gist.github.com/rxaviers/7360908
+      # https://github.com/ikatyang/emoji-cheat-sheet
       return case outcome
              when PASSED
                ":tada:"
@@ -65,6 +65,8 @@ module Fastlane
     end
 
     def self.random_emoji_cat
+      # Github emoji list
+      # https://github.com/ikatyang/emoji-cheat-sheet#cat-face
       %w(:smiley_cat: :smile_cat: :joy_cat: :heart_eyes_cat: :smirk_cat: :kissing_cat:).sample
     end
 
