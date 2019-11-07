@@ -17,7 +17,7 @@ Inspired by [Firebase test lab plugin for ios](https://github.com/fastlane/fastl
 
 Please check [Firebase documents](https://firebase.google.com/docs/test-lab/android/command-line)
 
-Using Google Cloud SDK.
+Using with Google Cloud SDK.
 ```
 # gcloud firebase test android run \
   --type robo \
