@@ -17,7 +17,7 @@ Inspired by [Firebase test lab plugin for ios](https://github.com/fastlane/fastl
 
 Please check [Firebase documents](https://firebase.google.com/docs/test-lab/android/command-line)
 
-Using Google Cloud SDK
+Using Google Cloud SDK.
 ```
 # gcloud firebase test android run \
   --type robo \
@@ -25,6 +25,15 @@ Using Google Cloud SDK
   --device model=Nexus6,version=24,locale=en,orientation=portrait  \
   --timeout 90s
   
+Have questions, feedback, or issues? Get support by visiting:
+  https://firebase.google.com/support/
+
+API [toolresults.googleapis.com] not enabled on project 
+[************]. Would you like to enable and retry (this will take a 
+few minutes)? (y/N)? y
+
+Enabling service [toolresults.googleapis.com] on project [************]...
+Operation "operations/acf.********-****-****-****-************" finished successfully.
   ...
   ...
   ...
@@ -99,7 +108,7 @@ service firebase.storage {
 
 Using [gcloud tool](https://cloud.google.com/sdk/gcloud/), you can run.
 
-```no-highlight
+```
 gcloud beta firebase test android models list
 ```
 
