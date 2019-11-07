@@ -150,7 +150,8 @@ lane :test do
       }
     ],
     app_apk: "app-debug.apk",                                       # The path for your android app apk.
-    # app_test_apk: "app-test.apk",                                 # The path for your android test apk.
+    # app_test_apk: "app-test.apk",                                 # The path for your android instrumentation test apk.
+    # use_orchestrator: false,                                      # If you use orchestrator when set instrumentation test.
     console_log_file_name: "fastlane/console_output.log",           
     timeout: "3m",                                                  
     firebase_test_lab_results_bucket: "firebase_cats_test_bucket",  # 

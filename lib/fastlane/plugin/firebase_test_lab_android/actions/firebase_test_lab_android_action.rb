@@ -17,9 +17,9 @@ module Fastlane
         Helper.authenticate(params[:gcloud_service_key_file])
         # Run Firebase Test Lab
         Helper.run_tests("--type #{params[:type]} "\
-                  "#{"--use-orchestrator " if params[:type] == "instrumentation"}"\
                   "--app #{params[:app_apk]} "\
                   "#{"--test #{params[:app_test_apk]} " unless params[:app_test_apk].nil?}"\
+                  "#{"--use-orchestrator " if params[:type] == "instrumentation" && params[:use_orchestrator]}"\
                   "#{params[:devices].map { |d| "--device model=#{d[:model]},version=#{d[:version]},locale=#{d[:locale]},orientation=#{d[:orientation]} " }.join}"\
                   "--timeout #{params[:timeout]} "\
                   "--results-bucket #{results_bucket} "\
@@ -127,36 +127,42 @@ module Fastlane
          FastlaneCore::ConfigItem.new(key: :timeout,
                                       env_name: "TIMEOUT",
                                       description: "The max time this test execution can run before it is cancelled. Default: 5m (this value must be greater than or equal to 1m)",
-                                      is_string: true,
+                                      type: String,
                                       optional: true,
                                       default_value: "3m"),
          FastlaneCore::ConfigItem.new(key: :app_apk,
                                       env_name: "APP_APK",
                                       description: "The path for your android app apk",
-                                      is_string: true,
+                                      type: String,
                                       optional: false),
          FastlaneCore::ConfigItem.new(key: :app_test_apk,
                                       env_name: "APP_TEST_APK",
                                       description: "The path for your android test apk. Default: empty string",
-                                      is_string: true,
+                                      type: String,
                                       optional: true,
                                       default_value: nil),
+         FastlaneCore::ConfigItem.new(key: :use_orchestrator,
+                                      env_name: "USE_ORCHESTRATOR",
+                                      description: "If you use orchestrator when set instrumentation test . Default: false",
+                                      type: Boolean,
+                                      optional: true,
+                                      default_value: false),
          FastlaneCore::ConfigItem.new(key: :console_log_file_name,
                                       env_name: "CONSOLE_LOG_FILE_NAME",
                                       description: "The filename to save the output results. Default: ./console_output.log",
-                                      is_string: true,
+                                      type: String,
                                       optional: true,
                                       default_value: "./console_output.log"),
          FastlaneCore::ConfigItem.new(key: :extra_options,
                                       env_name: "EXTRA_OPTIONS",
                                       description: "Extra options that you need to pass to the gcloud command. Default: empty string",
-                                      is_string: true,
+                                      type: String,
                                       optional: true,
                                       default_value: ""),
          FastlaneCore::ConfigItem.new(key: :slack_url,
                                       env_name: "SLACK_URL",
                                       description: "If Notify to Slack after finishing of the test. Set your slack incoming webhook url",
-                                      is_string: true,
+                                      type: String,
                                       optional: true,
                                       default_value: nil),
          FastlaneCore::ConfigItem.new(key: :firebase_test_lab_results_bucket,
@@ -238,6 +244,8 @@ module Fastlane
                 }
               ],
               app_apk: "test.apk",
+              # app_test_apk: "androidTest.apk",
+              # use_orchestrator: false,
               console_log_file_name: "fastlane/console_output.log",
               timeout: "3m",
               firebase_test_lab_results_bucket: "firebase_cats_test_bucket",
