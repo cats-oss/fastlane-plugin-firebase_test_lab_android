@@ -1,5 +1,6 @@
 require 'fastlane/action'
 require 'json'
+require 'fileutils'
 
 module Fastlane
   module Actions
@@ -10,6 +11,12 @@ module Fastlane
 
         results_bucket = params[:firebase_test_lab_results_bucket] == nil ? "#{params[:project_id]}_test_results" : params[:firebase_test_lab_results_bucket]
         results_dir = "firebase_test_result_#{DateTime.now.strftime('%Y-%m-%d-%H:%M:%S')}"
+
+        # Create the log file
+        dirname = File.dirname(params[:console_log_file_name])
+        unless File.directory?(dirname)
+          FileUtils.mkdir_p(dirname)
+        end
 
         # Set target project
         Helper.config(params[:project_id])
