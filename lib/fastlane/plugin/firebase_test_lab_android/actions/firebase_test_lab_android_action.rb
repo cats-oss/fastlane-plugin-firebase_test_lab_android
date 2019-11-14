@@ -9,14 +9,8 @@ module Fastlane
       def self.run(params)
         UI.message("Starting...")
 
-        results_bucket = params[:firebase_test_lab_results_bucket] == nil ? "#{params[:project_id]}_test_results" : params[:firebase_test_lab_results_bucket]
-        results_dir = "firebase_test_result_#{DateTime.now.strftime('%Y-%m-%d-%H:%M:%S')}"
-
-        # Create the log file
-        dirname = File.dirname(params[:console_log_file_name])
-        unless File.directory?(dirname)
-          FileUtils.mkdir_p(dirname)
-        end
+        results_bucket = params[:firebase_test_lab_results_bucket] || "#{params[:project_id]}_test_results"
+        results_dir = params[:firebase_test_lab_results_dir] || "firebase_test_result_#{DateTime.now.strftime('%Y-%m-%d-%H:%M:%S')}"
 
         # Set target project
         Helper.config(params[:project_id])
@@ -32,7 +26,7 @@ module Fastlane
                   "--results-bucket #{results_bucket} "\
                   "--results-dir #{results_dir} "\
                   "#{params[:extra_options]} "\
-                  "--format=json 1>#{params[:console_log_file_name]}"
+                  "--format=json 1>#{Helper.if_need_dir(params[:console_log_file_name])}"
         )
 
         # Sample data
@@ -175,6 +169,12 @@ module Fastlane
          FastlaneCore::ConfigItem.new(key: :firebase_test_lab_results_bucket,
                                       env_name: "FIREBASE_TEST_LAB_RESULTS_BUCKET",
                                       description: "Name of Firebase Test Lab results bucket",
+                                      type: String,
+                                      optional: true,
+                                      default_value: nil),
+         FastlaneCore::ConfigItem.new(key: :firebase_test_lab_results_dir,
+                                      env_name: "FIREBASE_TEST_LAB_RESULTS_DIR",
+                                      description: "Name of Firebase Test Lab results directory",
                                       type: String,
                                       optional: true,
                                       default_value: nil),

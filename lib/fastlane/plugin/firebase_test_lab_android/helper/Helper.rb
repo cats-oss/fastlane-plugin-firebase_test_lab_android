@@ -41,6 +41,15 @@ module Fastlane
       outcome == FAILED || outcome == INCONCLUSIVE
     end
 
+    def self.if_need_dir(path)
+      dirname = File.dirname(params[:console_log_file_name])
+      unless File.directory?(dirname)
+        UI.message("Crate directory: #{dirname}")
+        FileUtils.mkdir_p(dirname)
+      end
+      path
+    end
+
     def self.format_device_name(axis_value)
       # Sample Nexus6P-23-ja_JP-portrait
       array = axis_value.split("-")
