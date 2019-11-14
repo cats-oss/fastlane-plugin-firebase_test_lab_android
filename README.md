@@ -154,8 +154,9 @@ lane :test do
     # use_orchestrator: false,                                      # If you use orchestrator when set instrumentation test.
     console_log_file_name: "fastlane/console_output.log",           
     timeout: "3m",                                                  
-    firebase_test_lab_results_bucket: "firebase_cats_test_bucket",  # 
-    slack_url: ENV["SLACK_URL"],                                    # IF you want notify to Slack.
+    firebase_test_lab_results_bucket: "firebase_cats_test_bucket",  # If you want to naming bucket of GCS 
+    # firebase_test_lab_results_dir: "firebase_cats_test_dir",      # If you want to naming results of GCS. (Maybe don't need it.) 
+    slack_url: ENV["SLACK_URL"],                                    # If you want notify to Slack.
 
     # If you want notify to Github pull requests.
     github_owner: "******",                                         # Owner name. 
