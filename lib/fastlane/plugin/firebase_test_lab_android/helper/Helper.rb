@@ -42,7 +42,7 @@ module Fastlane
     end
 
     def self.if_need_dir(path)
-      dirname = File.dirname(params[:console_log_file_name])
+      dirname = File.dirname(path)
       unless File.directory?(dirname)
         UI.message("Crate directory: #{dirname}")
         FileUtils.mkdir_p(dirname)
