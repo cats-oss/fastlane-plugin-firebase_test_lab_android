@@ -43,9 +43,20 @@ module Fastlane
         #   }
         # ]
         json = JSON.parse(File.read(params[:console_log_file_name]))
+        UI.message("Test status: #{json}")
+
+        # Fetch results
+        download_dir = params[:download_dir]
+        if download_dir
+          UI.message("Fetch results from Firebase Test Lab results bucket")
+          json.each do |status|
+            Helper.if_need_dir("#{download_dir}/#{status["axis_value"]}")
+            Action.sh("gsutil -m cp -r gs://#{results_bucket}/#{results_dir}/#{status["axis_value"]} #{download_dir}")
+          end
+        end
 
         # Notify to Slack
-        if params[:slack_url] != nil
+        if params[:slack_url]
           success, body = Helper.make_slack_text(json)
           SlackNotifier.notify(params[:slack_url], body, success)
         end
@@ -55,7 +66,7 @@ module Fastlane
         repository = params[:github_repository]
         pr_number = params[:github_pr_number]
         api_token = params[:github_api_token]
-        unless owner.nil? || repository.nil? || pr_number.nil? || api_token.nil?
+        if owner && repository && pr_number && api_token
           prefix, comment = Helper.make_github_text(json, params[:project_id], results_bucket, results_dir)
           # Delete past comments
           GitHubNotifier.delete_comments(owner, repository, pr_number, prefix, api_token)
@@ -199,6 +210,12 @@ module Fastlane
          FastlaneCore::ConfigItem.new(key: :github_api_token,
                                       env_name: "GITHUB_API_TOKEN",
                                       description: "GitHub API Token",
+                                      type: String,
+                                      optional: true,
+                                      default_value: nil),
+         FastlaneCore::ConfigItem.new(key: :download_dir,
+                                      env_name: "DOWNLOAD_DIR",
+                                      description: "Target directory to download screenshots from firebase",
                                       type: String,
                                       optional: true,
                                       default_value: nil)
