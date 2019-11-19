@@ -34,7 +34,7 @@ module Fastlane
 
     def self.run_tests(arguments)
       UI.message("Test running...")
-      Action.sh("gcloud firebase test android run #{arguments}")
+      Action.sh("set +e; gcloud firebase test android run #{arguments}; set -e")
     end
 
     def self.is_failure(outcome)
