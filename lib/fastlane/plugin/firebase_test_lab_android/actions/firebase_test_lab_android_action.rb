@@ -67,7 +67,7 @@ module Fastlane
         pr_number = params[:github_pr_number]
         api_token = params[:github_api_token]
         if owner && repository && pr_number && api_token
-          prefix, comment = Helper.make_github_text(json, params[:project_id], results_bucket, results_dir)
+          prefix, comment = Helper.make_github_text(json, params[:project_id], results_bucket, results_dir, params[:type])
           # Delete past comments
           GitHubNotifier.delete_comments(owner, repository, pr_number, prefix, api_token)
           GitHubNotifier.put_comment(owner, repository, pr_number, comment, api_token)

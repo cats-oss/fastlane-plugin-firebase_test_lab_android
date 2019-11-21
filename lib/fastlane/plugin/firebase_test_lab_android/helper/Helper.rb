@@ -95,7 +95,7 @@ module Fastlane
       return success, body
     end
 
-    def self.make_github_text(json, project_id, bucket, dir)
+    def self.make_github_text(json, project_id, bucket, dir, test_type)
       prefix = "<img src=\"https://github.com/cats-oss/fastlane-plugin-firebase_test_lab_android/blob/master/art/firebase_test_lab_logo.png?raw=true\" width=\"65%\" loading=\"lazy\" />"
       cells = json.map { |data|
         axis = data["axis_value"]
@@ -104,7 +104,12 @@ module Fastlane
         status = "#{emoji_status(outcome)} #{outcome}"
         message = data["test_details"]
         logcat = "<a href=\"#{firebase_object_url(bucket, "#{dir}/#{axis}/logcat")}\" target=\"_blank\" >#{random_emoji_cat}</a>"
-        sitemp = "<img src=\"#{firebase_object_url(bucket, "#{dir}/#{axis}/artifacts/sitemap.png")}\" height=\"64px\" loading=\"lazy\" target=\"_blank\" />"
+        if test_type == "robo"
+          sitemp = "<img src=\"#{firebase_object_url(bucket, "#{dir}/#{axis}/artifacts/sitemap.png")}\" height=\"64px\" loading=\"lazy\" target=\"_blank\" />"
+        else
+          sitemp = "--"
+        end
+
         "| **#{device}** | #{status} | #{message} | #{logcat} | #{sitemp} |\n"
       }.inject(&:+)
       comment = <<~EOS
