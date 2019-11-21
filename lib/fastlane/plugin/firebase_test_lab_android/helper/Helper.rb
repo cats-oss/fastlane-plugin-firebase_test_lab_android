@@ -34,7 +34,7 @@ module Fastlane
 
     def self.run_tests(arguments)
       UI.message("Test running...")
-      Action.sh("gcloud firebase test android run #{arguments}")
+      Action.sh("set +e; gcloud firebase test android run #{arguments}; set -e")
     end
 
     def self.is_failure(outcome)
@@ -50,7 +50,7 @@ module Fastlane
       path
     end
 
-    def self.format_device_name(axis_value)
+    def self.split_device_name(axis_value)
       # Sample Nexus6P-23-ja_JP-portrait
       array = axis_value.split("-")
       "#{array[0]} (API #{array[1]})"
@@ -89,7 +89,7 @@ module Fastlane
       body = json.map { |status|
         outcome = status["outcome"]
         emoji = emoji_status(outcome)
-        device = format_device_name(status["axis_value"])
+        device = split_device_name(status["axis_value"])
         "#{device}: #{emoji} #{outcome}\n"
       }.inject(&:+)
       return success, body
@@ -99,7 +99,7 @@ module Fastlane
       prefix = "<img src=\"https://github.com/cats-oss/fastlane-plugin-firebase_test_lab_android/blob/master/art/firebase_test_lab_logo.png?raw=true\" width=\"65%\" loading=\"lazy\" />"
       cells = json.map { |data|
         axis = data["axis_value"]
-        device = format_device_name(axis)
+        device = split_device_name(axis)
         outcome = data["outcome"]
         status = "#{emoji_status(outcome)} #{outcome}"
         message = data["test_details"]
