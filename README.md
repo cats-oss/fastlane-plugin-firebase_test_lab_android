@@ -55,56 +55,7 @@ This project is a [_fastlane_](https://github.com/fastlane/fastlane) plugin. To 
 fastlane add_plugin firebase_test_lab_android 
 ```
 
-### Step 3. Create a GCS bucket
-
-[Creating storage buckets](https://cloud.google.com/storage/docs/creating-buckets)
-
-You will need the bucket name later in the Fastfile.
-
-If you using the `gsutil`.
-```s
-gsutil mb gs://[BUCKET_NAME]/
-```
-```
-# gsutil mb gs://firebase_cats_test_bucket                    
-Creating gs://firebase_cats_test_bucket/...
-```
-
-
-### Step 4. Import existing Google Cloud Storage buckets to Firebase Storage
-
-https://firebase.google.com/docs/storage
-
-Import GCS bucket on Firebase console at Storage.
-
-<img src="art/screenshot_firebase_storage_setup_bucket.png" width="75%" />
-
-
-#### Step 4-2. 
-
-Edit the Firebase Security Rules on Firebase console.
-
-<img src="art/screenshot_firebase_storage_rules.png" width="75%" />
-
-This plugin need some match rules it `images` and `logcat` file for hyperlinks.
-```
-rules_version = '2';
-service firebase.storage {
-  match /b/{bucket}/o {
-    match /{result_dir}/{device}/artifacts/{image} {
-    	allow read: if image.matches(".*(jpeg|jpg|png)$")
-  	}
-    match /{result_dir}/{device}/{file} {
-    	allow read: if file.matches("logcat")
-  	}
-    match /{allPaths=**} {
-      allow read, write: if request.auth != null;
-    }
-  }
-}
-```
-
-### Step 5. Find the devices you want to test on
+### Step 3. Find the devices you want to test on
 
 Using [gcloud tool](https://cloud.google.com/sdk/gcloud/), you can run.
 
@@ -117,7 +68,7 @@ to get a list of supported devices and their identifiers.
 Alternatively all available devices can also be seen [here](https://firebase.google.com/docs/test-lab/ios/available-testing-devices). 
 
 
-### Step 6. Add settings to your Fastfile
+### Step 4. Add settings to your Fastfile
 
 Test your app with Firebase Test Lab with ease using fastlane.  
 Check out the [example `Fastfile`](fastlane/Fastfile) to see how to use this plugin.
