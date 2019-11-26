@@ -50,8 +50,10 @@ module Fastlane
         if download_dir
           UI.message("Fetch results from Firebase Test Lab results bucket")
           json.each do |status|
-            Helper.if_need_dir("#{download_dir}/#{status["axis_value"]}")
-            Action.sh("gsutil -m cp -r gs://#{results_bucket}/#{results_dir}/#{status["axis_value"]} #{download_dir}")
+            axis = status["axis_value"]
+            Helper.if_need_dir("#{download_dir}/#{axis}")
+            Helper.copy_from_gcs("#{results_bucket}/#{results_dir}/#{axis}", download_dir)
+            Helper.set_public("#{results_bucket}/#{results_dir}/#{axis}")
           end
         end
 
@@ -277,7 +279,8 @@ module Fastlane
               github_owner: "cats-oss",
               github_repository: "fastlane-plugin-firebase_test_lab_android",
               github_pr_number: pr_number,
-              github_api_token: ENV["DANGER_GITHUB_API_TOKEN"]
+              github_api_token: ENV["DANGER_GITHUB_API_TOKEN"],
+              download_dir: ".results"
             )
           end']
       end

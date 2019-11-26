@@ -14,8 +14,8 @@ module Fastlane
       "https://console.developers.google.com/storage/browser/#{bucket}/#{CGI.escape(dir)}"
     end
 
-    def self.firebase_object_url(bucket, path)
-      "https://firebasestorage.googleapis.com/v0/b/#{bucket}/o/#{CGI.escape(path)}?alt=media"
+    def self.gcs_object_url(bucket, path)
+      "https://storage.googleapis.com/#{bucket}/#{CGI.escape(path)}"
     end
 
     def self.firebase_test_lab_histories_url(project_id)
@@ -35,6 +35,16 @@ module Fastlane
     def self.run_tests(arguments)
       UI.message("Test running...")
       Action.sh("set +e; gcloud firebase test android run #{arguments}; set -e")
+    end
+
+    def self.copy_from_gcs(bucket_and_path, copy_to)
+      UI.message("Copy from gs://#{bucket_and_path}")
+      Action.sh("gsutil -m cp -r gs://#{bucket_and_path} #{copy_to}")
+    end
+
+    def self.set_public(bucket_and_path)
+      UI.message("Set public for reading gs://#{bucket_and_path}")
+      Action.sh("gsutil -m acl -r set public-read gs://#{bucket_and_path}")
     end
 
     def self.is_failure(outcome)
@@ -103,9 +113,9 @@ module Fastlane
         outcome = data["outcome"]
         status = "#{emoji_status(outcome)} #{outcome}"
         message = data["test_details"]
-        logcat = "<a href=\"#{firebase_object_url(bucket, "#{dir}/#{axis}/logcat")}\" target=\"_blank\" >#{random_emoji_cat}</a>"
+        logcat = "<a href=\"#{gcs_object_url(bucket, "#{dir}/#{axis}/logcat")}\" target=\"_blank\" >#{random_emoji_cat}</a>"
         if test_type == "robo"
-          sitemp = "<img src=\"#{firebase_object_url(bucket, "#{dir}/#{axis}/artifacts/sitemap.png")}\" height=\"64px\" loading=\"lazy\" target=\"_blank\" />"
+          sitemp = "<img src=\"#{gcs_object_url(bucket, "#{dir}/#{axis}/artifacts/sitemap.png")}\" height=\"64px\" loading=\"lazy\" target=\"_blank\" />"
         else
           sitemp = "--"
         end
