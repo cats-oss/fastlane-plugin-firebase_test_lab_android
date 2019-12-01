@@ -115,6 +115,9 @@ lane :test do
     github_pr_number: pr_number,                                    # If you using run on CI that need pull request number for auto comment.
     github_api_token: ENV["GITHUB_API_TOKEN"],                      # https://github.com/settings/tokens
     download_dir: ".results"                                        # If you want to download to the results of Firebase test lab.  
+
+    # If you want to ignore some social sign-in buttons.
+    extra_test_lab_options: "--robo-directives ignore:image_button_sign_in_twitter=,ignore:image_button_sign_in_instagram="
   )
 end
 ```
