@@ -117,7 +117,7 @@ lane :test do
     download_dir: ".results",                                       # If you want to download to the results of Firebase test lab.  
 
     # If you want to ignore some social sign-in buttons.
-    extra_test_lab_options: "--robo-directives ignore:image_button_sign_in_twitter=,ignore:image_button_sign_in_instagram="
+    extra_options: "--robo-directives ignore:image_button_sign_in_twitter=,ignore:image_button_sign_in_instagram="
   )
 end
 ```
