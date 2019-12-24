@@ -140,9 +140,6 @@ module Fastlane
       success = true
 
       json.each do |status|
-        print("status[\"outcome\"] =====> " + status["outcome"].to_s)
-        print("status[:outcome] =====> " + status[:outcome].to_s)
-
         success = !is_failure(status["outcome"])
         break unless success
       end
