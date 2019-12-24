@@ -42,14 +42,14 @@ module Fastlane
         #     "test_details": "--"
         #   }
         # ]
-        json = JSON.parse(File.read(params[:console_log_file_name]))
-        UI.message("Test status: #{json}")
+        json_results = JSON.parse(File.read(params[:console_log_file_name]))
+        UI.message("Test status: #{json_results}")
 
         # Fetch results
         download_dir = params[:download_dir]
         if download_dir
           UI.message("Fetch results from Firebase Test Lab results bucket")
-          json.each do |status|
+          json_results.each do |status|
             axis = status["axis_value"]
             Helper.if_need_dir("#{download_dir}/#{axis}")
             Helper.copy_from_gcs("#{results_bucket}/#{results_dir}/#{axis}", download_dir)
@@ -59,7 +59,7 @@ module Fastlane
 
         # Notify to Slack
         if params[:slack_url]
-          success, body = Helper.make_slack_text(json)
+          success, body = Helper.make_slack_text(json_results)
           SlackNotifier.notify(params[:slack_url], body, success)
         end
 
@@ -69,13 +69,17 @@ module Fastlane
         pr_number = params[:github_pr_number]
         api_token = params[:github_api_token]
         if owner && repository && pr_number && api_token
-          prefix, comment = Helper.make_github_text(json, params[:project_id], results_bucket, results_dir, params[:type])
+          prefix, comment = Helper.make_github_text(json_results, params[:project_id], results_bucket, results_dir, params[:type])
           # Delete past comments
           GitHubNotifier.delete_comments(owner, repository, pr_number, prefix, api_token)
           GitHubNotifier.put_comment(owner, repository, pr_number, comment, api_token)
         end
 
         UI.message("Finishing...")
+
+        if json_results.downcase.include? "\"outcome\"=>\"Failed\"".downcase
+          raise "Tests Failed 🙈"
+        end
       end
 
       def self.description
