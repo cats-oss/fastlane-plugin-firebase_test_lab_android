@@ -77,7 +77,7 @@ module Fastlane
 
         UI.message("Finishing...")
 
-        if json_results.downcase.include? "\"outcome\"=>\"Failed\"".downcase
+        unless Helper.is_success(json_results)
           raise "Tests Failed 🙈"
         end
       end

@@ -135,5 +135,16 @@ module Fastlane
       EOS
       return prefix, comment
     end
+
+    def self.is_success(json)
+      success = true
+
+      json.each do |status|
+        success = !is_failure(status[:outcome])
+        break unless success
+      end
+
+      return success
+    end
   end
 end
