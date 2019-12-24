@@ -80,7 +80,7 @@ module Fastlane
         is_tests_passed = Helper.is_success(json_results)
         print "======> is_tests_passed: " + is_tests_passed.to_s
 
-        unless Helper.is_success(json_results)
+        unless is_tests_passed
           raise "Tests Failed 🙈"
         end
       end
