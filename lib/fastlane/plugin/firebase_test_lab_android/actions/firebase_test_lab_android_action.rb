@@ -77,6 +77,9 @@ module Fastlane
 
         UI.message("Finishing...")
 
+        is_tests_passed = Helper.is_success(json_results)
+        print "======> is_tests_passed: " + is_tests_passed.to_s
+
         unless Helper.is_success(json_results)
           raise "Tests Failed 🙈"
         end
