@@ -60,7 +60,7 @@ fastlane add_plugin firebase_test_lab_android
 Using [gcloud tool](https://cloud.google.com/sdk/gcloud/), you can run.
 
 ```
-gcloud beta firebase test android models list
+gcloud firebase test android models list
 ```
 
 to get a list of supported devices and their identifiers.
@@ -87,6 +87,8 @@ lane :test do
   firebase_test_lab_android(
     project_id: "cats-firebase",                                    # Your Firebase project name.
     gcloud_service_key_file: "fastlane/client-secret.json",         # File path containing the gcloud auth key.
+    # gcloud_components_channel: "beta",                            # If you use gcloud component channel option (alpha/beta).     
+    console_log_file_name: "fastlane/console_output.log",           
     type: "robo",                                                   # Optional: Test type (robo/instrumentation).
     devices: [                                                      # Devices
       {
@@ -103,8 +105,6 @@ lane :test do
     app_apk: "app-debug.apk",                                       # The path for your android app apk.
     # app_test_apk: "app-test.apk",                                 # The path for your android instrumentation test apk.
     # use_orchestrator: false,                                      # If you use orchestrator when set instrumentation test.
-    # use_beta_option: false,                                       # If you use beta option when set instrumentation test.  
-    console_log_file_name: "fastlane/console_output.log",           
     timeout: "3m",                                                  
     firebase_test_lab_results_bucket: "firebase_cats_test_bucket",  # If you want to naming bucket of GCS 
     # firebase_test_lab_results_dir: "firebase_cats_test_dir",      # If you want to naming results of GCS. (Maybe don't need it.) 
