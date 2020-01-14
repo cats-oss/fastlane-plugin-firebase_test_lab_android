@@ -168,12 +168,12 @@ module Fastlane
                                       default_value: false),
          FastlaneCore::ConfigItem.new(key: :gcloud_components_channel,
                                       env_name: "gcloud_components_channel",
-                                      description: "If you use beta or alpha components. Default: robo (alpha/beta)",
+                                      description: "If you use beta or alpha components. Default stable (alpha/beta)",
                                       is_string: true,
                                       optional: true,
-                                      default_value: "",
+                                      default_value: "stable",
                                       verify_block: proc do |value|
-                                        if value != "" && value != "alpha" && value != "beta"
+                                        if value != "stable" && value != "alpha" && value != "beta"
                                           UI.user_error!("Unknown gcloud component channel.")
                                         end
                                       end),

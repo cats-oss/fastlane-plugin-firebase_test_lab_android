@@ -88,7 +88,6 @@ lane :test do
     project_id: "cats-firebase",                                    # Your Firebase project name.
     gcloud_service_key_file: "fastlane/client-secret.json",         # File path containing the gcloud auth key.
     # gcloud_components_channel: "beta",                            # If you use gcloud component channel option (alpha/beta).     
-    console_log_file_name: "fastlane/console_output.log",           
     type: "robo",                                                   # Optional: Test type (robo/instrumentation).
     devices: [                                                      # Devices
       {
