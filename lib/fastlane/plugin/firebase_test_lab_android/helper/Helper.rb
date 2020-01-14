@@ -32,9 +32,9 @@ module Fastlane
       Action.sh("gcloud auth activate-service-account --key-file #{gcloud_key_file}")
     end
 
-    def self.run_tests(gcloud_components_channel, arguments)
+    def self.run_tests(use_beta_option, arguments)
       UI.message("Test running...")
-      Action.sh("set +e; gcloud #{gcloud_components_channel} firebase test android run #{arguments}; set -e")
+      Action.sh("set +e; gcloud #{use_beta_option ? "beta " : ""}firebase test android run #{arguments}; set -e")
     end
 
     def self.copy_from_gcs(bucket_and_path, copy_to)

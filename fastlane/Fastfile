@@ -1,18 +1,21 @@
 before_all do
-  ENV["SLACK_URL"] = "https://hooks.slack.com/services/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"
+  ENV["SLACK_URL"] = "https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
 end
 
 lane :test do
-  # upload to Firebase Test Lab
+
+  # Get Pull Request number
+  pr_number = ENV["CI_PULL_REQUEST"] != nil ? ENV["CI_PULL_REQUEST"][/(?<=https:\/\/github.com\/cats-oss\/android\/pull\/)(.*)/] : nil
+
+  # Upload to Firebase Test Lab
   firebase_test_lab_android(
-    project_id: "cats-234205",
+    project_id: "cats-firebase",
     gcloud_service_key_file: "fastlane/client-secret.json",
-    gcloud_components_channel: "alpha",
-    type: "instrumentation",
+    type: "robo",
     devices: [
       {
-        model: "NexusLowRes",
-        version: "27",
+        model: "Nexus6P",
+        version: "23",
         locale: "ja_JP",
         orientation: "portrait"
       },
@@ -21,16 +24,15 @@ lane :test do
         version: "28"
       }
     ],
-    app_apk: "~/Desktop/i-app.apk" ,
-    app_test_apk: "~/Desktop/i-androidTest.apk",
-    console_log_file_name: "log/console_output.log",
-    timeout: "3m",
-    firebase_test_lab_results_bucket: "firebase_cats_test_bucket_pr8",
+    app_apk: "test.apk",
+    console_log_file_name: "fastlane/console_output.log",
+    timeout: "60s",
+    firebase_test_lab_results_bucket: "firebase-test-lab-result-bucket",
     slack_url: ENV["SLACK_URL"],
-    download_dir: ".results",
     github_owner: "cats-oss",
     github_repository: "fastlane-plugin-firebase_test_lab_android",
-    github_pr_number: "8",
-    github_api_token: "fd4e560da02c76f53e15ce26eb73a94181de54bc"
+    github_pr_number: pr_number,
+    github_api_token: ENV["DANGER_GITHUB_API_TOKEN"],
+    download_dir: ".results"
   )
 end

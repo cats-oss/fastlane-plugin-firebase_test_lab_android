@@ -17,7 +17,7 @@ module Fastlane
         # Activate service account
         Helper.authenticate(params[:gcloud_service_key_file])
         # Run Firebase Test Lab
-        Helper.run_tests(params[:gcloud_components_channel], "--type #{params[:type]} "\
+        Helper.run_tests(params[:use_beta_option] ,"--type #{params[:type]} "\
                   "--app #{params[:app_apk]} "\
                   "#{"--test #{params[:app_test_apk]} " unless params[:app_test_apk].nil?}"\
                   "#{"--use-orchestrator " if params[:type] == "instrumentation" && params[:use_orchestrator]}"\
@@ -113,12 +113,7 @@ module Fastlane
                                       description: "Test type. Default: robo (robo/instrumentation)",
                                       is_string: true,
                                       optional: true,
-                                      default_value: "robo",
-                                      verify_block: proc do |value|
-                                        if value != "robo" && value != "instrumentation"
-                                          UI.user_error!("Unknown test type.")
-                                        end
-                                      end),
+                                      default_value: "robo"),
          FastlaneCore::ConfigItem.new(key: :devices,
                                       description: "Devices to test the app on",
                                       type: Array,
@@ -162,21 +157,16 @@ module Fastlane
                                       default_value: nil),
          FastlaneCore::ConfigItem.new(key: :use_orchestrator,
                                       env_name: "USE_ORCHESTRATOR",
-                                      description: "If you use orchestrator when set instrumentation test. Default: false",
+                                      description: "If you use orchestrator when set instrumentation test . Default: false",
                                       type: Boolean,
                                       optional: true,
                                       default_value: false),
-         FastlaneCore::ConfigItem.new(key: :gcloud_components_channel,
-                                      env_name: "gcloud_components_channel",
-                                      description: "If you use beta or alpha components. Default: robo (alpha/beta)",
-                                      is_string: true,
+         FastlaneCore::ConfigItem.new(key: :use_beta_option,
+                                      env_name: "USE_BETA_OPTION",
+                                      description: "If you use beta option when set instrumentation test . Default: false",
+                                      type: Boolean,
                                       optional: true,
-                                      default_value: "",
-                                      verify_block: proc do |value|
-                                        if value != "" && value != "alpha" && value != "beta"
-                                          UI.user_error!("Unknown gcloud component channel.")
-                                        end
-                                      end),
+                                      default_value: false),
          FastlaneCore::ConfigItem.new(key: :console_log_file_name,
                                       env_name: "CONSOLE_LOG_FILE_NAME",
                                       description: "The filename to save the output results. Default: ./console_output.log",
