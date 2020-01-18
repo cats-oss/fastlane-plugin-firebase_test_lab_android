@@ -25,6 +25,7 @@ module Fastlane
                   "--timeout #{params[:timeout]} "\
                   "--results-bucket #{results_bucket} "\
                   "--results-dir #{results_dir} "\
+                  "--num-uniform-shards=15 "\
                   "#{params[:extra_options]} "\
                   "--format=json 1>#{Helper.if_need_dir(params[:console_log_file_name])}"
         )
