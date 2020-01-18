@@ -12,10 +12,19 @@ module Fastlane
         results_bucket = params[:firebase_test_lab_results_bucket] || "#{params[:project_id]}_test_results"
         results_dir = params[:firebase_test_lab_results_dir] || "firebase_test_result_#{DateTime.now.strftime('%Y-%m-%d-%H:%M:%S')}"
 
+        # Default number of shards is 0
+        num_shards = 0
+
+        if params[:num_shards] > 0
+          num_shards = params[:num_shards]
+        end
+
         # Set target project
         Helper.config(params[:project_id])
+
         # Activate service account
         Helper.authenticate(params[:gcloud_service_key_file])
+
         # Run Firebase Test Lab
         Helper.run_tests("--type #{params[:type]} "\
                   "--app #{params[:app_apk]} "\
@@ -25,7 +34,7 @@ module Fastlane
                   "--timeout #{params[:timeout]} "\
                   "--results-bucket #{results_bucket} "\
                   "--results-dir #{results_dir} "\
-                  "--num-uniform-shards=15 "\
+                  "--num-uniform-shards=#{num_shards} "\
                   "#{params[:extra_options]} "\
                   "--format=json 1>#{Helper.if_need_dir(params[:console_log_file_name])}"
         )
