@@ -73,7 +73,7 @@ module Fastlane
         api_token = params[:github_api_token]
         if owner && repository && pr_number && api_token
           test_url = Helper.firebase_test_lab_histories_url(params[:project_id], test_run_output.to_s)
-          test_matrix_name = Helper.firebase_test_lab_histories_url(params[:project_id], test_run_output)
+          test_matrix_name = Helper.get_matrix_name(test_run_output)
 
           prefix, comment = Helper.make_github_text(json_results, results_bucket, results_dir, params[:type], test_matrix_name, test_url)
           # Delete past comments
