@@ -22,9 +22,9 @@ module Fastlane
       # "https://console.firebase.google.com/u/0/project/#{project_id}/testlab/histories/"
       url = test_run_output.match("More details are available at (.*)")[1].sub('[','').sub('].','')
       print "URL to parse: " + url + "\n\n"
-      
-      first_index = url.index('*')
-      last_index = url.rindex('*')
+
+      first_index = url.index("*")
+      last_index = url.rindex("*")
 
       print "first_index: " + first_index.to_s + "\n"
       print "last_index: " + last_index.to_s + "\n"
