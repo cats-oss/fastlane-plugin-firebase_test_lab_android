@@ -18,8 +18,25 @@ module Fastlane
       "https://storage.googleapis.com/#{bucket}/#{CGI.escape(path)}"
     end
 
-    def self.firebase_test_lab_histories_url(project_id)
-      "https://console.firebase.google.com/u/0/project/#{project_id}/testlab/histories/"
+    def self.firebase_test_lab_histories_url(project_id, test_run_output)
+      # "https://console.firebase.google.com/u/0/project/#{project_id}/testlab/histories/"
+      url = test_run_output.match("More details are available at (.*)")[1].sub('[','').sub('].','')
+      print "URL to parse: " + url
+      
+      first_index = url.index('*')
+      last_index = url.rindex('*')
+      text_to_replace = url[first_index..last_index]
+      
+      return url.sub(text_to_replace, project_id)
+    end
+
+    def self.get_matrix_name(test_run_output)
+      text_with_test_matrix = test_run_output.match("(.*) has been created in the Google Cloud.")[0]
+
+      start_index = text_with_test_matrix.index('[') + 1
+      end_index = text_with_test_matrix.index(']') - 1
+
+      return text_with_test_matrix[start_index..end_index]
     end
 
     def self.config(project_id)
@@ -34,11 +51,7 @@ module Fastlane
 
     def self.run_tests(arguments)
       UI.message("Test running...")
-      result = Action.sh("set +e; gcloud beta firebase test android run #{arguments}; set -e")
-
-      print "============> " + result.to_s
-
-      result
+      return Action.sh("set +e; gcloud beta firebase test android run #{arguments}; set -e").to_s
     end
 
     def self.copy_from_gcs(bucket_and_path, copy_to)
@@ -109,7 +122,7 @@ module Fastlane
       return success, body
     end
 
-    def self.make_github_text(json, project_id, bucket, dir, test_type)
+    def self.make_github_text(json, bucket, dir, test_type, test_matrix_name, test_url)
       prefix = "<img src=\"https://github.com/cats-oss/fastlane-plugin-firebase_test_lab_android/blob/master/art/firebase_test_lab_logo.png?raw=true\" width=\"65%\" loading=\"lazy\" />"
       cells = json.map { |data|
         axis = data["axis_value"]
@@ -130,7 +143,8 @@ module Fastlane
         #{prefix}
 
         ### Results
-        Firebase console: [#{project_id}](#{Helper.firebase_test_lab_histories_url(project_id)}) 
+        Firebase console: #{test_url} 
+        Test matrix: #{test_matrix_name} 
         Test results: [#{dir}](#{Helper.gcs_result_bucket_url(bucket, dir)})
 
         | :iphone: Device | :thermometer: Status | :memo: Message | :eyes: Logcat | :japan: Sitemap | 

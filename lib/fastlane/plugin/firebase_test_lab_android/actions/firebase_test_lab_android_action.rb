@@ -19,7 +19,7 @@ module Fastlane
         Helper.authenticate(params[:gcloud_service_key_file])
 
         # Run Firebase Test Lab
-        Helper.run_tests("--type #{params[:type]} "\
+        test_run_output = Helper.run_tests("--type #{params[:type]} "\
                   "--app #{params[:app_apk]} "\
                   "#{"--test #{params[:app_test_apk]} " unless params[:app_test_apk].nil?}"\
                   "#{"--use-orchestrator " if params[:type] == "instrumentation" && params[:use_orchestrator]}"\
@@ -72,7 +72,10 @@ module Fastlane
         pr_number = params[:github_pr_number]
         api_token = params[:github_api_token]
         if owner && repository && pr_number && api_token
-          prefix, comment = Helper.make_github_text(json_results, params[:project_id], results_bucket, results_dir, params[:type])
+          test_url = Helper.firebase_test_lab_histories_url(params[:project_id], test_run_output.to_s)
+          test_matrix_name = Helper.firebase_test_lab_histories_url(params[:project_id], test_run_output)
+
+          prefix, comment = Helper.make_github_text(json_results, results_bucket, results_dir, params[:type], test_matrix_name, test_url)
           # Delete past comments
           GitHubNotifier.delete_comments(owner, repository, pr_number, prefix, api_token)
           GitHubNotifier.put_comment(owner, repository, pr_number, comment, api_token)
