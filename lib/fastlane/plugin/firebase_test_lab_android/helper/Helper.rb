@@ -106,8 +106,6 @@ module Fastlane
     end
 
     def self.make_github_text(json, project_id, bucket, dir, test_type)
-      print "============>>>>>>>>> " + json.to_s
-
       prefix = "<img src=\"https://github.com/cats-oss/fastlane-plugin-firebase_test_lab_android/blob/master/art/firebase_test_lab_logo.png?raw=true\" width=\"65%\" loading=\"lazy\" />"
       cells = json.map { |data|
         axis = data["axis_value"]
