@@ -21,20 +21,31 @@ module Fastlane
     def self.firebase_test_lab_histories_url(project_id, test_run_output)
       # "https://console.firebase.google.com/u/0/project/#{project_id}/testlab/histories/"
       url = test_run_output.match("More details are available at (.*)")[1].sub('[','').sub('].','')
-      print "URL to parse: " + url
+      print "URL to parse: " + url + "\n\n"
       
       first_index = url.index('*')
       last_index = url.rindex('*')
+
+      print "first_index: " + first_index.to_s + "\n"
+      print "last_index: " + last_index.to_s + "\n"
+
       text_to_replace = url[first_index..last_index]
-      
+
+      print "text_to_replace: " + text_to_replace.to_s + "\n"
+
       return url.sub(text_to_replace, project_id)
     end
 
     def self.get_matrix_name(test_run_output)
       text_with_test_matrix = test_run_output.match("(.*) has been created in the Google Cloud.")[0]
 
+      print "Matrix text to parse: " +  text_with_test_matrix + "\n\n"
+
       start_index = text_with_test_matrix.index('[') + 1
       end_index = text_with_test_matrix.index(']') - 1
+
+      print "start_index: " + start_index.to_s + "\n"
+      print "end_index: " + end_index.to_s + "\n"
 
       return text_with_test_matrix[start_index..end_index]
     end
@@ -143,8 +154,7 @@ module Fastlane
         #{prefix}
 
         ### Results
-        Firebase console: #{test_url} 
-        Test matrix: #{test_matrix_name} 
+        Firebase console: [#{test_matrix_name}](#{test_url}) 
         Test results: [#{dir}](#{Helper.gcs_result_bucket_url(bucket, dir)})
 
         | :iphone: Device | :thermometer: Status | :memo: Message | :eyes: Logcat | :japan: Sitemap | 
