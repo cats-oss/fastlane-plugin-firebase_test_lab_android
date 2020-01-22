@@ -34,7 +34,11 @@ module Fastlane
 
     def self.run_tests(arguments)
       UI.message("Test running...")
-      Action.sh("set +e; gcloud beta firebase test android run #{arguments}; set -e")
+      result = Action.sh("set +e; gcloud beta firebase test android run #{arguments}; set -e")
+
+      print "============> " + result.to_s
+
+      result
     end
 
     def self.copy_from_gcs(bucket_and_path, copy_to)
