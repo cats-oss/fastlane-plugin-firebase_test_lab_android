@@ -21,7 +21,6 @@ module Fastlane
     def self.firebase_test_lab_histories_url(project_id, test_run_output)
       # "https://console.firebase.google.com/u/0/project/#{project_id}/testlab/histories/"
       url = test_run_output.match("More details are available at (.*)")[1].sub('[','').sub('].','').to_s
-      print "URL to parse: " + url + "\n\n"
 
       #first_index = url.index('*')
       #last_index = url.rindex('*')
@@ -33,13 +32,8 @@ module Fastlane
     def self.get_matrix_name(test_run_output)
       text_with_test_matrix = test_run_output.match("(.*) has been created in the Google Cloud.")[0]
 
-      print "Matrix text to parse: " +  text_with_test_matrix + "\n\n"
-
       start_index = text_with_test_matrix.index('[') + 1
       end_index = text_with_test_matrix.index(']') - 1
-
-      print "start_index: " + start_index.to_s + "\n"
-      print "end_index: " + end_index.to_s + "\n"
 
       return text_with_test_matrix[start_index..end_index]
     end
