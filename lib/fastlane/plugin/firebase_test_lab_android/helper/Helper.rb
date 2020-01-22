@@ -23,17 +23,15 @@ module Fastlane
       url = test_run_output.match("More details are available at (.*)")[1].sub('[','').sub('].','')
       print "URL to parse: " + url + "\n\n"
 
-      first_index = url.index("*")
-      last_index = url.rindex("*")
+      #first_index = url.index("*")
+      #last_index = url.rindex("*")
+      #
+      #print "first_index: " + first_index.to_s + "\n"
+      #print "last_index: " + last_index.to_s + "\n"
+      #
+      #text_to_replace = url[first_index..last_index]
 
-      print "first_index: " + first_index.to_s + "\n"
-      print "last_index: " + last_index.to_s + "\n"
-
-      text_to_replace = url[first_index..last_index]
-
-      print "text_to_replace: " + text_to_replace.to_s + "\n"
-
-      return url.sub(text_to_replace, project_id)
+      return url.sub("**************", project_id)
     end
 
     def self.get_matrix_name(test_run_output)
