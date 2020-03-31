@@ -13,6 +13,10 @@ Inspired by [Firebase test lab plugin for ios](https://github.com/fastlane/fastl
 [![Gem](https://img.shields.io/gem/v/fastlane-plugin-firebase_test_lab_android.svg?style=flat)](https://rubygems.org/gems/fastlane-plugin-firebase_test_lab_android)
 [![fastlane Plugin Badge](https://rawcdn.githack.com/fastlane/fastlane/master/fastlane/assets/plugin-badge.svg)](https://rubygems.org/gems/fastlane-plugin-firebase_test_lab_android)
 
+### Step 0. Enable the Google Cloud Testing API and Cloud Tool Results API 
+
+You must enable the Google Cloud Testing API and Cloud Tool Results API in the [Google Developers Console API Library page](https://console.developers.google.com/apis/library).
+
 ### Step 1. First of all, get started with Firebase Test Lab from the gcloud Command Line
 
 Please check [Firebase documents](https://firebase.google.com/docs/test-lab/android/command-line)
