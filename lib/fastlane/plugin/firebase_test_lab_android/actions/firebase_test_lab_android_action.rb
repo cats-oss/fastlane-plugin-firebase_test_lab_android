@@ -53,7 +53,9 @@ module Fastlane
             axis = status["axis_value"]
             Helper.if_need_dir("#{download_dir}/#{axis}")
             Helper.copy_from_gcs("#{results_bucket}/#{results_dir}/#{axis}", download_dir)
-            Helper.set_public("#{results_bucket}/#{results_dir}/#{axis}")
+            if params[:publish_result]
+              Helper.set_public("#{results_bucket}/#{results_dir}/#{axis}")
+            end
           end
         end
 
@@ -236,7 +238,13 @@ module Fastlane
                                       description: "Target directory to download screenshots from firebase",
                                       type: String,
                                       optional: true,
-                                      default_value: nil)
+                                      default_value: nil),
+         FastlaneCore::ConfigItem.new(key: :publish_result,
+                                      env_name: "PUBLISH_RESULT",
+                                      description: "Set result's ACL to public (effective only if download_dir is set)",
+                                      type: Boolean,
+                                      optional: true,
+                                      default_value: true)
         ]
       end
 
